@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Take an online, consistent snapshot of the Aivora database. Safe to run while the service is up.
+// Take an online, consistent snapshot of the TermiNow Store database. Safe to run while the service is up.
 //
 //   node scripts/backup.mjs [target.sqlite]
 //

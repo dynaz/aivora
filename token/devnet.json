@@ -1,14 +1,37 @@
 {
-  "name": "Aivora Test",
-  "symbol": "AIVR",
+  "app": "TermiNow",
+  "tokenProject": "TermiNow AI",
+  "store": "TermiNow Store",
   "network": "devnet",
   "standard": "SPL Token",
   "status": "deployed-devnet-test",
   "test_only": true,
-  "mintAddress": "DgacUbB4Pz2mHK85UKjs5D26JaTneAy93HA4wveECNX3",
-  "decimals": 6,
-  "totalSupply": "1000000",
-  "recipientTokenAccount": "BC8jyxUo8JTSiHGfFACvK2DiumcU3R5wFSuSwLPEPdpa",
-  "recipientOwner": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
-  "note": "TEST ONLY — disposable Devnet supply, not final tokenomics. Mainnet disabled. Mint/freeze authorities intentionally retained for test flexibility."
+  "token": {
+    "name": "TermiNow AI Test",
+    "symbol": "TNAI",
+    "description": "Devnet test token for TermiNow Store.",
+    "mintAddress": "DgacUbB4Pz2mHK85UKjs5D26JaTneAy93HA4wveECNX3",
+    "decimals": 6,
+    "totalSupply": "1000000",
+    "recipientTokenAccount": "BC8jyxUo8JTSiHGfFACvK2DiumcU3R5wFSuSwLPEPdpa",
+    "recipientOwner": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+    "mintAuthority": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+    "freezeAuthority": null,
+    "metadata": {
+      "program": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+      "metadataPda": "Czd9oKmb2EckVcPVAUUowGubM7asUstoXBaxV9JRrM7T",
+      "onChainName": "TermiNow AI Test",
+      "onChainSymbol": "TNAI",
+      "uri": "",
+      "isMutable": true,
+      "updateAuthority": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+      "createdSignature": "3usoX4h98F65NEcpHQA5Cb317MdZN8jFyGN8ZGXz2bc6ZHC6fruxBaf7raAHAfQQpumfZnoPhyEX1zK32aggEfAK"
+    }
+  },
+  "legacy": {
+    "note": "This same mint was originally created under the label Aivora / symbol AIVR with NO on-chain metadata. The mint ADDRESS is unchanged; only Metaplex metadata (name/symbol) was added, so the on-chain symbol is now TNAI. Earlier Devnet orders/payments reference this same mint and must be shown with their original payment asset identity.",
+    "originalName": "Aivora Test",
+    "originalSymbol": "AIVR"
+  },
+  "note": "TEST ONLY — disposable Devnet supply, not final tokenomics, no monetary value and no guaranteed price or return. Mainnet disabled. Metadata was ADDED to the existing mint on Devnet (name/symbol only; description + uri are off-chain and recorded here). A display rename does not change the mint address. Mint/freeze/update authorities are intentionally retained (not revoked) for test flexibility; no replacement mint was created. Existing orders, entitlements and payment history are retained unchanged."
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Restore the Aivora database from a snapshot. STOP THE SERVICE FIRST:
+// Restore the TermiNow Store database from a snapshot. STOP THE SERVICE FIRST:
 //
 //   sudo systemctl stop aivora
 //   node scripts/restore.mjs <backup.sqlite>

@@ -1,7 +1,7 @@
 // Online backup and restore for the SQLite database.
 //
 // Backups use `VACUUM INTO`, which writes a fully consistent snapshot even while the service is running
-// and holding read connections — no need to stop Aivora to take one. Restores DO require the service to
+// and holding read connections — no need to stop TermiNow Store to take one. Restores DO require the service to
 // be stopped (so nothing is mid-write): the CLI wrapper documents this. Every backup and restore runs an
 // integrity check, and restore keeps a timestamped safety copy of the database it replaces so a bad
 // restore can itself be rolled back.
@@ -42,11 +42,11 @@ export function restore(backupPath, dbPath) {
   const src = resolve(backupPath);
   if (!existsSync(src)) throw new Error('Backup not found: ' + src);
   if (integrity(src) !== 'ok') throw new Error('Backup failed integrity check; refusing to restore: ' + src);
-  // A valid Aivora database carries the migration ledger; guard against restoring an unrelated file.
+  // A valid TermiNow Store database carries the migration ledger; guard against restoring an unrelated file.
   const check = new DatabaseSync(src, { readOnly: true });
   try {
     const t = check.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='schema_migrations'").get();
-    if (!t) throw new Error('Backup does not look like an Aivora database (no schema_migrations table)');
+    if (!t) throw new Error('Backup does not look like a TermiNow Store database (no schema_migrations table)');
   } finally { check.close(); }
 
   const dst = resolve(dbPath);

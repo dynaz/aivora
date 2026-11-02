@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Aivora Store — deploy / update script for the Ubuntu host.
+# TermiNow Store — deploy / update script for the Ubuntu host.
 #
 # Run as root (it manages a dedicated unprivileged service user). It is idempotent and safe to re-run:
 # it backs up the database BEFORE migrating, applies migrations, restarts the loopback service, and

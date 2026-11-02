@@ -1,8 +1,8 @@
-// Aivora storefront (Devnet sandbox): browse the catalog, create a quote for a product, submit a
+// TermiNow Store storefront (Devnet sandbox): browse the catalog, create a quote for a product, submit a
 // finalized Devnet payment signature, and view entitlements. Test tokens only — this never activates
 // anything in the real TermiNow app and never asks for a seed phrase. CSRF token is read from the
 // readable csrf cookie and echoed on every state-changing request.
-export const storePage = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aivora Store</title>
+export const storePage = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TermiNow Store</title>
 <style>
 body{font:17px system-ui;background:#0b1024;color:#edf0ff;max-width:760px;margin:40px auto;padding:24px}
 h1{color:#a995ff;margin-bottom:4px}h2{color:#9e8cff;font-size:18px;margin-top:28px}
@@ -15,8 +15,8 @@ button.buy{width:auto;padding:8px 16px;margin:0}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#141a36;padding:12px;border-radius:8px}
 .badge{display:inline-block;background:#1c2a3e;color:#8ef;border-radius:6px;padding:2px 8px;font-size:12px}
 </style>
-<h1>Aivora Store</h1>
-<p class="muted">TermiNow Premium &amp; feature add-ons · Devnet sandbox · test tokens only</p>
+<h1>TermiNow Store</h1>
+<p class="muted">TermiNow Premium &amp; feature add-ons · paid in TermiNow AI (TNAI) Devnet test token · test prices only, no monetary value</p>
 <p><a href="/">Account (log in / register)</a></p>
 <p id="status" class="muted"></p>
 
@@ -47,7 +47,7 @@ async function api(method,path,data){
   const opt=method==='GET'?{}:{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},body:JSON.stringify(data)};
   const r=await fetch(path,opt); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||('HTTP '+r.status)); return d;
 }
-function money(raw){ return (Number(raw)/1e6).toLocaleString()+' test AIVR'; }
+function money(raw){ return (Number(raw)/1e6).toLocaleString()+' test TNAI'; }
 function when(ms){ return ms?new Date(ms).toLocaleString():'—'; }
 async function loadCatalog(){
   const el=document.querySelector('#catalog');

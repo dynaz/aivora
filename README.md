@@ -1,4 +1,4 @@
-# Aivora (AIVR)
+# TermiNow Store
 
 Local prototype for AI services paid with demo usage credits. No real payments or blockchain token is deployed.
 
@@ -35,4 +35,4 @@ A process crash during an upstream request leaves its credit reserved in `pendin
 See `docs/ROADMAP.md`. Proposed Solana configuration is in `token/devnet.json`; supply and allocation are not finalized. No mainnet transactions, liquidity deposits or removal of token authorities are automated.
 
 ## TermiNow Premium sandbox
-Visit `/premium` after logging in. See [Devnet setup and integration boundary](docs/TERMINOW_PREMIUM.md). This adds test redemption orders and sandbox expiry only; it does not activate real TermiNow Premium. Fixed test AIVR prices are not real market quotes.
+Visit `/premium` after logging in. See [Devnet setup and integration boundary](docs/TERMINOW_PREMIUM.md). This adds test redemption orders and sandbox expiry only; it does not activate real TermiNow Premium. Fixed test TNAI prices are not real market quotes.
