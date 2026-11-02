@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# NowAI Store — rollback script.
+# TermiNow Store — rollback script.
 #
 # Restores the database from a snapshot and/or reverts the code to a previous commit, then restarts and
 # health-checks the loopback service. The service is stopped before the database is swapped (restore

@@ -1,8 +1,8 @@
-// NowAI admin console. All data comes from the RBAC-guarded /api/admin/* endpoints; this page only
+// TermiNow Store admin console. All data comes from the RBAC-guarded /api/admin/* endpoints; this page only
 // renders. A non-admin session sees a notice and no controls (the server enforces access regardless).
 // Admin role is assigned out-of-band via scripts/admin.mjs, never here. Manual grants/revocations
 // require a reason, which is recorded in the audit log.
-export const adminPage = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NowAI Admin</title>
+export const adminPage = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TermiNow Store Admin</title>
 <style>
 body{font:16px system-ui;background:#0b1024;color:#edf0ff;max-width:900px;margin:32px auto;padding:20px}
 h1{color:#a995ff}h2{color:#9e8cff;font-size:17px;margin-top:26px;border-bottom:1px solid #2a2f52;padding-bottom:6px}
@@ -15,7 +15,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#141a36;padding:10px;
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .gate{background:#241a2e;border:1px solid #5a2f52;border-radius:8px;padding:16px}
 </style>
-<h1>NowAI Admin</h1>
+<h1>TermiNow Store Admin</h1>
 <p class="muted" id="who">Checking access…</p>
 <div id="app" hidden>
   <p><a href="/store">Storefront</a> · <a href="/">Account</a></p>

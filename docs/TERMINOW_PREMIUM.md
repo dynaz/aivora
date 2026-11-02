@@ -1,6 +1,6 @@
-# NowAI × TermiNow Premium — Devnet sandbox
+# TermiNow Premium Premium — Devnet sandbox
 
-This is a redemption sandbox, **not** a production TermiNow integration. It neither reads nor changes real TermiNow accounts. User identity is currently the local NowAI account. No token is created and no wallet transaction is signed by this server.
+This is a redemption sandbox, **not** a production TermiNow integration. It neither reads nor changes real TermiNow accounts. User identity is currently the local TermiNow Store account. No token is created and no wallet transaction is signed by this server.
 
 ## Run
 1. Start the local server and register/log in at `/`.
@@ -9,9 +9,9 @@ This is a redemption sandbox, **not** a production TermiNow integration. It neit
 4. In a Devnet transaction tool, include one top-level SPL `transferChecked` instruction for the exact raw amount and a top-level Memo Program instruction containing the returned memo. Sign with the quoted payer wallet. Only use test assets. A wallet transaction-building button is not yet implemented.
 5. Submit the finalized transaction signature. The server checks the fixed public Devnet RPC, Devnet genesis hash, successful finality, first signature, signer, memo, transfer details, decimals, recipient balance delta, and transaction block time against the quote window.
 
-The 15-minute quote is valid for the payment block time; a finalized payment made within that window can be submitted later. Quotes use fixed **test** prices: 10 test AIVR for 30 days, 100 for 365 days. These are not approved retail prices or market quotations. Nonmatching transfers do not activate anything; there is no automated refund for mistakenly sent test tokens.
+The 15-minute quote is valid for the payment block time; a finalized payment made within that window can be submitted later. Quotes use fixed **test** prices: 10 test TNAI for 30 days, 100 for 365 days. These are not approved retail prices or market quotations. Nonmatching transfers do not activate anything; there is no automated refund for mistakenly sent test tokens.
 
-## API (authenticated NowAI session required)
+## API (authenticated TermiNow Store session required)
 - `GET /api/premium/plans`
 - `POST /api/premium/order` with `{ "plan": "terminow-30d", "payer": "PUBLIC_WALLET_ADDRESS" }`
 - `POST /api/premium/redeem` with `{ "orderId": "UUID", "signature": "TRANSACTION_SIGNATURE" }`

@@ -48,16 +48,16 @@ test('backup then restore round-trips committed data and keeps a safety copy', (
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('restore refuses a non-NowAI or corrupt file', () => {
+test('restore refuses a non-TermiNow Store or corrupt file', () => {
   const dir = mkdtempSync(join(tmpdir(), 'aivora-bak-'));
   try {
     const dbPath = join(dir, 'aivora.sqlite');
     freshDb(dbPath).close();
 
-    // A valid SQLite file that is not a NowAI database.
+    // A valid SQLite file that is not a TermiNow Store database.
     const foreign = join(dir, 'foreign.sqlite');
     const f = new DatabaseSync(foreign); f.exec('CREATE TABLE whatever(x)'); f.close();
-    assert.throws(() => restore(foreign, dbPath), /does not look like a NowAI database/);
+    assert.throws(() => restore(foreign, dbPath), /does not look like a TermiNow Store database/);
 
     // Not even a SQLite file.
     const junk = join(dir, 'junk.sqlite');
