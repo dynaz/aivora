@@ -30,6 +30,9 @@ test('API validates requests, charges once and persists across process restart',
   const originalFetch=globalThis.fetch;
   const authenticated=(url,opts={})=>originalFetch(url,{...opts,headers:{...opts.headers,Cookie:cookie}});
   globalThis.fetch=authenticated; t.after(()=>{globalThis.fetch=originalFetch;});
+  assert.equal((await fetch(base+'/premium')).status,200);
+  const plans=await (await fetch(base+'/api/premium/plans')).json();assert.equal(plans.sandbox,true);assert.equal(plans.plans.length,2);
+  const premium=await (await fetch(base+'/api/premium/status')).json();assert.equal(premium.terminowLinked,false);assert.equal(premium.expires,null);
   assert.equal((await post({id:'bad',message:''})).status,400);
   assert.equal((await post({id:'bad',message:'hello'},{Origin:'https://other.example'})).status,403);
   assert.equal((await post({id:'once',message:'hello'})).status,200);
