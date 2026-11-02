@@ -10,15 +10,23 @@ import { page } from './page.mjs';
 import { loadConfig } from './config.mjs';
 import { log, accessLog } from './logger.mjs';
 import { newCsrfToken, csrfValid, hostAllowed, originAllowed, readCookie, cookie } from './security.mjs';
+import { migrate } from './migrations.mjs';
+import { Catalog } from './catalog.mjs';
+import { Entitlements } from './entitlements.mjs';
+import { Store } from './store.mjs';
+import { makeDeliverer } from './delivery.mjs';
 
 const config = loadConfig();
 const path = resolve(process.env.AIVORA_DB || 'data/aivora.sqlite');
 mkdirSync(dirname(path), { recursive: true });
 const accounts = new Accounts(path);
-const premium = new Premium(accounts.db, {
-  mint: process.env.AIVR_DEVNET_MINT,
-  destination: process.env.AIVR_DEVNET_RECIPIENT_TOKEN_ACCOUNT,
-});
+log('info', { event: 'migrate', applied: migrate(accounts.db) });
+const payConfig = { mint: process.env.AIVR_DEVNET_MINT, destination: process.env.AIVR_DEVNET_RECIPIENT_TOKEN_ACCOUNT };
+const premium = new Premium(accounts.db, payConfig);
+const entitlements = new Entitlements(accounts.db);
+const catalog = new Catalog(accounts.db);
+const store = new Store(accounts.db, catalog, entitlements, payConfig);
+const deliverer = makeDeliverer(config.delivery);
 const attempts = new Map();
 
 function json(res, status, data) {
@@ -87,6 +95,9 @@ const server = http.createServer(async (req, res) => {
     if (!user) return json(res, 401, { error: 'Please log in' });
     if (req.url === '/api/premium/plans') return json(res, 200, { sandbox: true, plans });
     if (req.url === '/api/premium/status') return json(res, 200, premium.status(user));
+    if (req.url === '/api/catalog') return json(res, 200, { sandbox: true, products: catalog.list() });
+    if (req.url === '/api/entitlements') return json(res, 200, { entitlements: entitlements.list(user) });
+    if (req.url === '/api/store/status') return json(res, 200, store.status(user));
     if (req.url === '/api/balance') return json(res, 200, { email: user, balance: accounts.balance(user) });
     if (req.url === '/api/history') return json(res, 200, { transactions: accounts.history(user) });
     return json(res, 404, { error: 'Not found' });
@@ -119,6 +130,12 @@ const server = http.createServer(async (req, res) => {
     if (!user) return json(res, 401, { error: 'Please log in' });
     if (req.url === '/api/premium/order') return json(res, 201, premium.create(user, data.plan, data.payer));
     if (req.url === '/api/premium/redeem') return json(res, 200, await premium.redeem(user, data.orderId, data.signature, verifyDevnetPayment));
+    if (req.url === '/api/store/order') return json(res, 201, store.create(user, data.productId, data.payer));
+    if (req.url === '/api/store/redeem') {
+      const result = await store.redeem(user, data.orderId, data.signature, verifyDevnetPayment);
+      entitlements.deliver(deliverer).catch(e => log('error', { event: 'deliver_error', message: String(e && e.message || e) }));
+      return json(res, 200, result);
+    }
     if (req.url === '/api/logout') {
       accounts.logout(token);
       res.setHeader('Set-Cookie', cookie('session', '', { httpOnly: true, secure: config.secureCookies, maxAge: 0 }));
@@ -140,4 +157,10 @@ const server = http.createServer(async (req, res) => {
 server.requestTimeout = 10000;
 server.listen(config.port, config.bindHost, () =>
   log('info', { event: 'listening', url: 'http://' + config.bindHost + ':' + server.address().port, mode: config.mode }));
-for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => server.close(() => { accounts.close(); process.exit(0); }));
+
+// Outbox worker: drain any pending/retryable deliveries, including ones left by a previous run.
+const worker = setInterval(() => entitlements.deliver(deliverer).catch(e => log('error', { event: 'deliver_error', message: String(e && e.message || e) })), 15000);
+worker.unref();
+entitlements.deliver(deliverer).catch(() => {});
+
+for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => { clearInterval(worker); server.close(() => { accounts.close(); process.exit(0); }); });

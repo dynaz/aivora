@@ -32,5 +32,15 @@ export function loadConfig(env = process.env) {
 
   // Cookie Secure flag follows the canonical origin's scheme (https), never a forwarded header.
   const secureCookies = canonical ? canonical.secure : false;
-  return Object.freeze({ mode, canonical, trustProxy, bindHost, port, secureCookies });
+
+  // Entitlement delivery (outbox worker). 'log' = sandbox (no real TermiNow call); 'http' = POST to the
+  // TermiNow server-to-server endpoint. The admin key is server-only and never sent to clients.
+  const deliveryMode = env.AIVORA_DELIVERY_MODE === 'http' ? 'http' : 'log';
+  const delivery = Object.freeze({
+    deliveryMode,
+    deliveryUrl: env.TERMINOW_ENTITLEMENT_URL || '',
+    deliveryKey: env.TERMINOW_ENTITLEMENT_KEY || '',
+  });
+
+  return Object.freeze({ mode, canonical, trustProxy, bindHost, port, secureCookies, delivery });
 }
