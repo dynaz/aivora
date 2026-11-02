@@ -6,6 +6,7 @@ import { generate } from './provider.mjs';
 import { Premium, plans } from './premium.mjs';
 import { verifyDevnetPayment } from './solana.mjs';
 import { premiumPage } from './premium-page.mjs';
+import { storePage } from './store-page.mjs';
 import { page } from './page.mjs';
 import { loadConfig } from './config.mjs';
 import { log, accessLog } from './logger.mjs';
@@ -85,6 +86,9 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === 'GET' && req.url === '/premium') {
     ensureCsrf(req, res); res.setHeader('Content-Type', 'text/html; charset=utf-8'); return res.end(premiumPage);
+  }
+  if (req.method === 'GET' && req.url === '/store') {
+    ensureCsrf(req, res); res.setHeader('Content-Type', 'text/html; charset=utf-8'); return res.end(storePage);
   }
   if (req.method === 'GET' && req.url === '/api/csrf') return json(res, 200, { token: ensureCsrf(req, res) });
 
