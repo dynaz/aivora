@@ -1,6 +1,6 @@
-# Aivora × TermiNow Premium — Devnet sandbox
+# NowAI × TermiNow Premium — Devnet sandbox
 
-This is a redemption sandbox, **not** a production TermiNow integration. It neither reads nor changes real TermiNow accounts. User identity is currently the local Aivora account. No token is created and no wallet transaction is signed by this server.
+This is a redemption sandbox, **not** a production TermiNow integration. It neither reads nor changes real TermiNow accounts. User identity is currently the local NowAI account. No token is created and no wallet transaction is signed by this server.
 
 ## Run
 1. Start the local server and register/log in at `/`.
@@ -11,7 +11,7 @@ This is a redemption sandbox, **not** a production TermiNow integration. It neit
 
 The 15-minute quote is valid for the payment block time; a finalized payment made within that window can be submitted later. Quotes use fixed **test** prices: 10 test AIVR for 30 days, 100 for 365 days. These are not approved retail prices or market quotations. Nonmatching transfers do not activate anything; there is no automated refund for mistakenly sent test tokens.
 
-## API (authenticated Aivora session required)
+## API (authenticated NowAI session required)
 - `GET /api/premium/plans`
 - `POST /api/premium/order` with `{ "plan": "terminow-30d", "payer": "PUBLIC_WALLET_ADDRESS" }`
 - `POST /api/premium/redeem` with `{ "orderId": "UUID", "signature": "TRANSACTION_SIGNATURE" }`

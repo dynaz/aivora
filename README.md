@@ -1,4 +1,4 @@
-# Aivora (AIVR)
+# NowAI
 
 Local prototype for AI services paid with demo usage credits. No real payments or blockchain token is deployed.
 

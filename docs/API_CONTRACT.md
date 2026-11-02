@@ -1,6 +1,6 @@
-# Aivora ↔ TermiNow integration contract
+# NowAI ↔ TermiNow integration contract
 
-This is the interface between the Aivora Store backend and the TermiNow app/backend. It covers three
+This is the interface between the NowAI Store backend and the TermiNow app/backend. It covers three
 surfaces: **account linking**, the authenticated **"my entitlements"** API, and the server-to-server
 **entitlement delivery** outbox. All amounts are raw SPL base units (decimals = 6); all timestamps are
 epoch milliseconds; `expires: null` means a permanent (non-expiring) entitlement.
@@ -95,7 +95,7 @@ Content-Type: application/json
 **Delivery semantics TermiNow must honor:**
 - **Idempotency:** the same `eventId` / `Idempotency-Key` may be delivered more than once (retries,
   restarts). Process each `eventId` at most once; acknowledge duplicates with `2xx`.
-- **Success = `2xx`.** Any non-2xx or a network error causes Aivora to retry with backoff; return `2xx`
+- **Success = `2xx`.** Any non-2xx or a network error causes NowAI to retry with backoff; return `2xx`
   only once the grant/revoke is durably applied.
 - **Ordering is not guaranteed.** Reconcile by `email` + `featureKey`; a `revoke` supersedes an earlier
   `grant` for the same pair. When in doubt, the authenticated entitlements API is the source of truth.
@@ -105,7 +105,7 @@ Content-Type: application/json
   shipped in the TermiNow mobile app. The app authenticates users by session or by the linked
   `terminowRef`, and reads entitlements via the API / receives them via the backend — it never holds an
   admin or signing secret.
-- Admin roles in Aivora are assigned out-of-band only (a CLI on the server); there is no API or signup
+- Admin roles in NowAI are assigned out-of-band only (a CLI on the server); there is no API or signup
   path to become an admin.
 
 ## Verification status (what has actually been exercised)

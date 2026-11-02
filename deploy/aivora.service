@@ -1,4 +1,4 @@
-# Aivora Store — unprivileged systemd service.
+# NowAI Store — unprivileged systemd service.
 #
 # Install to /etc/systemd/system/aivora.service (scripts/deploy.sh does this). The service runs as the
 # dedicated, unprivileged `aivora` user, binds loopback only (the public entry point is LiteSpeed in
@@ -8,7 +8,7 @@
 # Adjust ExecStart if `node` is not at /usr/bin/node on this host (run `command -v node`).
 
 [Unit]
-Description=Aivora Store (TermiNow Premium storefront)
+Description=NowAI Store (TermiNow Premium storefront)
 Documentation=https://github.com/dynaz/aivora
 After=network-online.target
 Wants=network-online.target

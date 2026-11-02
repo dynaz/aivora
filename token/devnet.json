@@ -1,14 +1,22 @@
 {
-  "name": "Aivora Test",
-  "symbol": "AIVR",
+  "brand": "NowAI",
+  "store": "NowAI Store",
+  "proposedSymbol": "NOWAI",
   "network": "devnet",
   "standard": "SPL Token",
   "status": "deployed-devnet-test",
   "test_only": true,
-  "mintAddress": "DgacUbB4Pz2mHK85UKjs5D26JaTneAy93HA4wveECNX3",
-  "decimals": 6,
-  "totalSupply": "1000000",
-  "recipientTokenAccount": "BC8jyxUo8JTSiHGfFACvK2DiumcU3R5wFSuSwLPEPdpa",
-  "recipientOwner": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
-  "note": "TEST ONLY — disposable Devnet supply, not final tokenomics. Mainnet disabled. Mint/freeze authorities intentionally retained for test flexibility."
+  "deployedTestMint": {
+    "label": "NowAI Devnet test token (created under the earlier Aivora/AIVR label)",
+    "symbol": "AIVR",
+    "mintAddress": "DgacUbB4Pz2mHK85UKjs5D26JaTneAy93HA4wveECNX3",
+    "decimals": 6,
+    "totalSupply": "1000000",
+    "recipientTokenAccount": "BC8jyxUo8JTSiHGfFACvK2DiumcU3R5wFSuSwLPEPdpa",
+    "recipientOwner": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+    "mintAuthority": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+    "freezeAuthority": null,
+    "hasOnChainMetadata": false
+  },
+  "note": "TEST ONLY — disposable Devnet supply, not final tokenomics. Mainnet disabled. The brand is now NowAI (proposed token symbol NOWAI), but the deployed Devnet test mint above was created with the symbol AIVR and has NO on-chain (Metaplex) metadata account, so its symbol is an off-chain label only — a display rename does NOT change the mint address. The mint authority (a Devnet-only treasury keypair) is controlled by this project. Adopting NOWAI as the real on-chain symbol requires an explicit test-token migration (new Devnet mint + recipient token account, re-point AIVR_DEVNET_* env vars), proposed but NOT performed here; existing orders, entitlements and payment history are retained unchanged. Mint/freeze authorities intentionally retained for test flexibility."
 }

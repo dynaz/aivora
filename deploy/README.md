@@ -1,4 +1,4 @@
-# Aivora Store — Ubuntu deployment & rollback
+# NowAI Store — Ubuntu deployment & rollback
 
 The storefront is a single Node service (no external runtime dependencies — it uses `node:sqlite`). It
 runs as a dedicated **unprivileged** user bound to a **loopback port**, and is published through the
@@ -66,9 +66,9 @@ Only after DNS points the domain at this host and a certificate is in place:
 4. Validate the config and reload LiteSpeed gracefully:
    ```bash
    sudo cp /usr/local/lsws/conf/vhosts/<domain>/vhost.conf{,.bak-$(date +%s)}
-   sudo /usr/local/lsws/bin/lswsctrl restart       # graceful; verify both Aivora AND existing sites after
+   sudo /usr/local/lsws/bin/lswsctrl restart       # graceful; verify both NowAI AND existing sites after
    ```
-5. If anything regresses (Aivora or an existing site), restore the `.bak` vhost file and reload again.
+5. If anything regresses (NowAI or an existing site), restore the `.bak` vhost file and reload again.
 
 ## Rollback
 
