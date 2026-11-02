@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*keypair*.json
+secrets/
+coverage/
+.DS_Store
+data/
+*.sqlite
+*.sqlite-*

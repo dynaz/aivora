@@ -1,0 +1,11 @@
+{
+  "name": "Aivora",
+  "symbol": "AIVR",
+  "network": "devnet",
+  "standard": "SPL Token",
+  "status": "proposal-only",
+  "mintAddress": null,
+  "decimals": 6,
+  "totalSupply": null,
+  "note": "Supply and allocations are not finalized. No token has been deployed."
+}
