@@ -7,7 +7,9 @@ import { Premium, plans } from './premium.mjs';
 import { verifyDevnetPayment } from './solana.mjs';
 import { premiumPage } from './premium-page.mjs';
 import { storePage } from './store-page.mjs';
+import { adminPage } from './admin-page.mjs';
 import { page } from './page.mjs';
+import { Admins, orders as adminOrders, reconcile } from './admin.mjs';
 import { loadConfig } from './config.mjs';
 import { log, accessLog } from './logger.mjs';
 import { newCsrfToken, csrfValid, hostAllowed, originAllowed, readCookie, cookie } from './security.mjs';
@@ -27,7 +29,9 @@ const premium = new Premium(accounts.db, payConfig);
 const entitlements = new Entitlements(accounts.db);
 const catalog = new Catalog(accounts.db);
 const store = new Store(accounts.db, catalog, entitlements, payConfig);
+const admins = new Admins(accounts.db);
 const deliverer = makeDeliverer(config.delivery);
+const fireDelivery = () => entitlements.deliver(deliverer).catch(e => log('error', { event: 'deliver_error', message: String(e && e.message || e) }));
 const attempts = new Map();
 
 function json(res, status, data) {
@@ -90,6 +94,9 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/store') {
     ensureCsrf(req, res); res.setHeader('Content-Type', 'text/html; charset=utf-8'); return res.end(storePage);
   }
+  if (req.method === 'GET' && req.url === '/admin') {
+    ensureCsrf(req, res); res.setHeader('Content-Type', 'text/html; charset=utf-8'); return res.end(adminPage);
+  }
   if (req.method === 'GET' && req.url === '/api/csrf') return json(res, 200, { token: ensureCsrf(req, res) });
 
   const token = readCookie(req.headers.cookie, 'session') || '';
@@ -104,6 +111,18 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/api/store/status') return json(res, 200, store.status(user));
     if (req.url === '/api/balance') return json(res, 200, { email: user, balance: accounts.balance(user) });
     if (req.url === '/api/history') return json(res, 200, { transactions: accounts.history(user) });
+    // Admin (RBAC). whoami is readable by any session; everything else requires a role.
+    if (req.url === '/api/admin/whoami') return json(res, 200, { email: user, role: admins.role(user) || null });
+    if (req.url.split('?')[0].startsWith('/api/admin/')) {
+      if (!admins.isAdmin(user)) return json(res, 403, { error: 'Admin access required' });
+      const u = new URL(req.url, 'http://local');
+      if (u.pathname === '/api/admin/catalog') return json(res, 200, { products: catalog.list(false) });
+      if (u.pathname === '/api/admin/orders') return json(res, 200, adminOrders(accounts.db));
+      if (u.pathname === '/api/admin/reconcile') return json(res, 200, reconcile(accounts.db));
+      if (u.pathname === '/api/admin/events') return json(res, 200, { events: entitlements.events(u.searchParams.get('status') || undefined) });
+      if (u.pathname === '/api/admin/audit') return json(res, 200, { audit: entitlements.auditLog() });
+      return json(res, 404, { error: 'Not found' });
+    }
     return json(res, 404, { error: 'Not found' });
   }
 
@@ -137,8 +156,18 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/api/store/order') return json(res, 201, store.create(user, data.productId, data.payer));
     if (req.url === '/api/store/redeem') {
       const result = await store.redeem(user, data.orderId, data.signature, verifyDevnetPayment);
-      entitlements.deliver(deliverer).catch(e => log('error', { event: 'deliver_error', message: String(e && e.message || e) }));
+      fireDelivery();
       return json(res, 200, result);
+    }
+    // Admin (RBAC). Role is assigned only via scripts/admin.mjs, never through any API.
+    if (req.url.startsWith('/api/admin/')) {
+      if (!admins.isAdmin(user)) return json(res, 403, { error: 'Admin access required' });
+      if (req.url === '/api/admin/catalog/upsert') return json(res, 200, catalog.upsert(data.product || {}));
+      if (req.url === '/api/admin/catalog/active') { catalog.setActive(data.id, !!data.active); return json(res, 200, { ok: true }); }
+      if (req.url === '/api/admin/events/retry') { const retried = entitlements.retry(data.eventId); fireDelivery(); return json(res, 200, { retried }); }
+      if (req.url === '/api/admin/grant') { const expires = entitlements.adminGrant(user, data.email, data.featureKey, data.days ?? null, data.reason); fireDelivery(); return json(res, 200, { expires }); }
+      if (req.url === '/api/admin/revoke') { entitlements.adminRevoke(user, data.email, data.featureKey, data.reason); fireDelivery(); return json(res, 200, { ok: true }); }
+      return json(res, 404, { error: 'Not found' });
     }
     if (req.url === '/api/logout') {
       accounts.logout(token);

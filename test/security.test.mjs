@@ -7,7 +7,7 @@ test('CSRF tokens validate only on exact constant-time match', () => {
   const t = newCsrfToken();
   assert.equal(t.length, 64);
   assert.equal(csrfValid(t, t), true);
-  assert.equal(csrfValid(t, t.slice(0, -1) + '0'), false);
+  assert.equal(csrfValid(t, t.slice(0, -1) + (t.endsWith('0') ? '1' : '0')), false);
   assert.equal(csrfValid(t, ''), false);
   assert.equal(csrfValid('', ''), false);
   assert.equal(csrfValid(t, undefined), false);
