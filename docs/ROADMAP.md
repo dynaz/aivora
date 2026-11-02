@@ -6,9 +6,9 @@
 
 ## 1 — AI service MVP
 - Select one provider and model; keep API keys on the server.
-- Add user authentication and per-user SQL accounts.
-- Reserve estimated cost transactionally, settle actual usage and refund failed requests.
-- Bind idempotency keys to user and request payload; save completed responses.
+- Implemented locally: password login, expiring sessions and per-user SQL accounts.
+- Implemented locally: fixed one-credit reservations, cached responses and failure refunds. Next: usage-based pricing and crash reconciliation.
+- Implemented: bind idempotency keys to user and request payload; save completed responses.
 - Rate limits, usage caps, audit logs and concurrency tests.
 
 ## 2 — Solana Devnet

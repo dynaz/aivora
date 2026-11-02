@@ -1,34 +1,35 @@
 # Aivora (AIVR)
 
-AI services paid with usage credits. Initial budget: THB 10,000.
+Local prototype for AI services paid with demo usage credits. No real payments or blockchain token is deployed.
 
-## Run the local prototype
-
-Requires Node.js 22.13 or newer. No external packages required.
+## Run
+Requires Node.js 22.13+ (SQLite may emit an experimental warning on Node 22).
 
 ```sh
 npm test
 npm start
 ```
 
-Open http://127.0.0.1:3000. This is a **local demo**: credits persist in a local SQLite database and have no monetary value. Chat responses are simulated. No AI API requests, wallet connection, blockchain transactions or real payments are implemented.
+Open http://127.0.0.1:3000. Register with email and a 12–128 character password, then log in. Each account receives 100 **demo** credits. Each successful response costs one demo credit, regardless of token usage; this is not production pricing.
 
-## Project layout
+## AI configuration
+Default mode is simulated and makes no external calls. To enable the OpenAI Responses API, copy `.env.example` to `.env`, set your key and a model available to your API account, then run:
 
-- `src/ledger.mjs`: transactional SQLite credit ledger with idempotent charging
-- `src/server.mjs`: localhost-only demo UI and API
-- `test/ledger.test.mjs`: credit accounting checks
-- `docs/ROADMAP.md`: staged delivery plan
-- `token/devnet.json`: proposed token configuration, not a deployed mint
+```sh
+node --env-file=.env src/server.mjs
+```
 
-## Security
+Never commit credentials. Keys stay server-side. Live requests send the message to OpenAI, use a 30-second timeout, request at most 256 output tokens and set `store:false`. Review provider data policies before using sensitive content. Provider adapter tests use mocks; no live API call was tested.
 
-Never commit wallet keypairs, seed phrases, private keys or API credentials. The demo server must not be exposed publicly. Production requires authentication, per-user transactional accounting, rate limiting and payment verification.
+## Accounts and accounting
+Passwords are salted scrypt hashes. Session tokens are random, stored hashed, expire after 24 hours, and use HttpOnly/SameSite=Strict cookies. Authentication attempts are limited per process. SQLite transactions reserve one credit before a request. Explicit provider failure refunds once; completed answers are cached by user and request ID. Conflicting payloads are rejected. `/api/history` returns only the logged-in user's latest request IDs and states.
 
-## Token status
+SQLite lives at `data/aivora.sqlite`, excluded from Git; override with `AIVORA_DB`. Previous shared demo ledger tables remain untouched but are no longer used. Back up with the server stopped. Requests contain message and response text; protect local data.
 
-Aivora / AIVR on Solana is proposed. Supply, allocations and utility are not finalized. No mainnet mint or liquidity pool has been created. Token ownership does not promise returns or revenue share.
+## Limits before production
+Localhost-only development server; do not expose publicly. Email verification, password reset, HTTPS/Secure cookies, distributed rate limiting, registration abuse controls and production monitoring are still required. Demo signup credits are not monetary assets. One credit per response is a prototype rule, not an AI cost quotation.
 
-## Local storage
+A process crash during an upstream request leaves its credit reserved in `pending` state. Do not automatically retry or refund these: provider billing may already have happened. An operator reconciliation workflow is required before production. Provider failure refunds user credits but may still incur API costs. No real-money top-ups are implemented.
 
-The shared demo account starts with 100 credits only on first run. SQLite data is stored at `data/aivora.sqlite` (excluded from Git). Set `AIVORA_DB` to choose another path. `GET /api/history` returns the latest 20 charges without message content. Request IDs are bound to amount and message; retries do not charge twice, including after restart. The database contains message payloads for retry checks; protect or delete local demo data when finished. Back up only while the server is stopped. Node SQLite may emit an experimental warning on Node 22.
+## Roadmap
+See `docs/ROADMAP.md`. Proposed Solana configuration is in `token/devnet.json`; supply and allocation are not finalized. No mainnet transactions, liquidity deposits or removal of token authorities are automated.
