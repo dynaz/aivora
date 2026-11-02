@@ -1,12 +1,12 @@
 # Delivery roadmap
 
 ## 0 — Local prototype (this change)
-- Local demo UI, simulated chat and in-memory integer credits.
+- Local demo UI, simulated chat and persistent SQLite integer credits.
 - Idempotent charges and accounting tests.
 
 ## 1 — AI service MVP
 - Select one provider and model; keep API keys on the server.
-- Add user authentication and a persistent SQL ledger.
+- Add user authentication and per-user SQL accounts.
 - Reserve estimated cost transactionally, settle actual usage and refund failed requests.
 - Bind idempotency keys to user and request payload; save completed responses.
 - Rate limits, usage caps, audit logs and concurrency tests.
