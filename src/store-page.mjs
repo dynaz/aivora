@@ -35,6 +35,11 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#141a36;padding:12px;
 <button id="redeem" type="button">Verify payment</button>
 <pre id="result" hidden></pre>
 
+<h2>Link the TermiNow app</h2>
+<p class="muted">Generate a one-time code, then enter it in TermiNow to link this account. Each code is valid for 10 minutes and works once.</p>
+<button id="link" type="button">Generate link code</button>
+<pre id="linkcode" hidden></pre>
+
 <script>
 function csrf(){return (document.cookie.match(/(?:^|; )csrf=([^;]+)/)||[])[1]||''}
 let selected=null, order=null;
@@ -82,6 +87,13 @@ document.querySelector('#redeem').onclick=async()=>{
     let id=order&&order.id; try{ id=id||localStorage.getItem('aivoraStoreOrder'); }catch{}
     const d=await api('POST','/api/store/redeem',{orderId:id,signature:document.querySelector('#signature').value});
     out.textContent=JSON.stringify(d,null,2); loadEntitlements();
+  }catch(e){ out.textContent=e.message; }
+};
+document.querySelector('#link').onclick=async()=>{
+  const out=document.querySelector('#linkcode'); out.hidden=false;
+  try{
+    const d=await api('POST','/api/link/code',{});
+    out.textContent='Code: '+d.code+'\\nExpires: '+when(d.expires)+'\\nEnter this in TermiNow within 10 minutes.';
   }catch(e){ out.textContent=e.message; }
 };
 loadCatalog(); loadEntitlements();

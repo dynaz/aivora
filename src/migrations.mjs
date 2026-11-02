@@ -81,6 +81,30 @@ export const migrations = [
       for (const p of SEED_PRODUCTS) insert.run(p.id, p.kind, p.name, p.description, p.days, p.feature_key, p.amount);
     },
   },
+  {
+    // Account linking between a store account and a TermiNow app install. A store user mints a
+    // short-lived, single-use code (only its sha256 hash is stored); the TermiNow backend redeems it
+    // once to establish the link. There is deliberately no way to link by submitting an arbitrary
+    // email/ID — only a verified code redemption creates a link.
+    id: '003-account-linking',
+    up: db => db.exec(`
+      CREATE TABLE IF NOT EXISTS link_codes(
+        code_hash TEXT PRIMARY KEY,           -- sha256 of the code; the plaintext is never stored
+        email TEXT NOT NULL,
+        created INTEGER NOT NULL,
+        expires INTEGER NOT NULL,
+        used INTEGER NOT NULL DEFAULT 0 CHECK(used IN (0,1)),
+        used_at INTEGER,
+        terminow_ref TEXT);                   -- the app reference that redeemed it
+
+      CREATE TABLE IF NOT EXISTS account_links(
+        email TEXT NOT NULL,
+        terminow_ref TEXT NOT NULL,
+        created INTEGER NOT NULL,
+        PRIMARY KEY(email, terminow_ref));
+
+      CREATE INDEX IF NOT EXISTS idx_link_codes_email ON link_codes(email);`),
+  },
 ];
 
 export function migrate(db) {

@@ -17,6 +17,7 @@ import { migrate } from './migrations.mjs';
 import { Catalog } from './catalog.mjs';
 import { Entitlements } from './entitlements.mjs';
 import { Store } from './store.mjs';
+import { Linking } from './linking.mjs';
 import { makeDeliverer } from './delivery.mjs';
 
 const config = loadConfig();
@@ -29,6 +30,7 @@ const premium = new Premium(accounts.db, payConfig);
 const entitlements = new Entitlements(accounts.db);
 const catalog = new Catalog(accounts.db);
 const store = new Store(accounts.db, catalog, entitlements, payConfig);
+const linking = new Linking(accounts.db, entitlements);
 const admins = new Admins(accounts.db);
 const deliverer = makeDeliverer(config.delivery);
 const fireDelivery = () => entitlements.deliver(deliverer).catch(e => log('error', { event: 'deliver_error', message: String(e && e.message || e) }));
@@ -109,6 +111,7 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/api/catalog') return json(res, 200, { sandbox: true, products: catalog.list() });
     if (req.url === '/api/entitlements') return json(res, 200, { entitlements: entitlements.list(user) });
     if (req.url === '/api/store/status') return json(res, 200, store.status(user));
+    if (req.url === '/api/link/links') return json(res, 200, { links: linking.links(user) });
     if (req.url === '/api/balance') return json(res, 200, { email: user, balance: accounts.balance(user) });
     if (req.url === '/api/history') return json(res, 200, { transactions: accounts.history(user) });
     // Admin (RBAC). whoami is readable by any session; everything else requires a role.
@@ -150,7 +153,17 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { ok: true });
     }
 
+    // Account linking: redeeming a code is PUBLIC (the single-use code is the bearer of authority) but
+    // rate-limited per IP. Minting a code requires an authenticated session (handled below).
+    if (req.url === '/api/link/redeem') {
+      const key = 'link:' + ip; const now = Date.now(); let bucket = attempts.get(key);
+      if (!bucket || now > bucket.until) { bucket = { count: 0, until: now + 60000 }; attempts.set(key, bucket); }
+      if (++bucket.count > 10) return json(res, 429, { error: 'Try again in one minute' });
+      return json(res, 200, linking.redeem(data.code, data.terminowRef));
+    }
+
     if (!user) return json(res, 401, { error: 'Please log in' });
+    if (req.url === '/api/link/code') return json(res, 201, linking.create(user));
     if (req.url === '/api/premium/order') return json(res, 201, premium.create(user, data.plan, data.payer));
     if (req.url === '/api/premium/redeem') return json(res, 200, await premium.redeem(user, data.orderId, data.signature, verifyDevnetPayment));
     if (req.url === '/api/store/order') return json(res, 201, store.create(user, data.productId, data.payer));
