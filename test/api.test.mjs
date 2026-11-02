@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-test('API validates requests, charges once and persists across process restart',async()=>{
+test('API validates requests, charges once and persists across process restart',async(t)=>{
  const dir=mkdtempSync(join(tmpdir(),'aivora-api-'));
  let child;
  async function start(){
@@ -22,6 +22,14 @@ test('API validates requests, charges once and persists across process restart',
   let base=await start();
   const post=(data,headers={})=>fetch(base+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(data)});
   assert.equal((await fetch(base+'/')).status,200);
+  assert.equal((await fetch(base+'/api/balance')).status,401);
+  const credentials={email:'test@example.com',password:'a-long-test-password'};
+  const auth=async(action)=>fetch(base+'/api/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(credentials)});
+  assert.equal((await auth('register')).status,201);
+  let login=await auth('login');let cookie=login.headers.get('set-cookie').split(';')[0];
+  const originalFetch=globalThis.fetch;
+  const authenticated=(url,opts={})=>originalFetch(url,{...opts,headers:{...opts.headers,Cookie:cookie}});
+  globalThis.fetch=authenticated; t.after(()=>{globalThis.fetch=originalFetch;});
   assert.equal((await post({id:'bad',message:''})).status,400);
   assert.equal((await post({id:'bad',message:'hello'},{Origin:'https://other.example'})).status,403);
   assert.equal((await post({id:'once',message:'hello'})).status,200);
