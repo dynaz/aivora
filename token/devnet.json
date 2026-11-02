@@ -1,11 +1,14 @@
 {
-  "name": "Aivora",
+  "name": "Aivora Test",
   "symbol": "AIVR",
   "network": "devnet",
   "standard": "SPL Token",
-  "status": "proposal-only",
-  "mintAddress": null,
+  "status": "deployed-devnet-test",
+  "test_only": true,
+  "mintAddress": "DgacUbB4Pz2mHK85UKjs5D26JaTneAy93HA4wveECNX3",
   "decimals": 6,
-  "totalSupply": null,
-  "note": "Supply and allocations are not finalized. No token has been deployed."
+  "totalSupply": "1000000",
+  "recipientTokenAccount": "BC8jyxUo8JTSiHGfFACvK2DiumcU3R5wFSuSwLPEPdpa",
+  "recipientOwner": "AP5Tv8KaniNWhsKnbpKyvoGNtyTtoJgNpNEPMMvWpi9s",
+  "note": "TEST ONLY — disposable Devnet supply, not final tokenomics. Mainnet disabled. Mint/freeze authorities intentionally retained for test flexibility."
 }
